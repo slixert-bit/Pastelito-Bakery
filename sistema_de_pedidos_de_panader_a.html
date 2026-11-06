@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-stone-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panadería Miga & Masa - Sitio Oficial de Pedidos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+    </style>
+</head>
+<body class="h-full text-stone-800 flex flex-col antialiased selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- Header Navigation -->
+    <header class="bg-stone-900 text-amber-50 sticky top-0 z-30 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="filterCategory('all')">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 flex items-center justify-center font-bold text-2xl shadow-md border-2 border-amber-300">
+                        <i class="fa-solid fa-wheat-awn"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold font-serif text-amber-100 leading-none">Miga & Masa</h1>
+                        <span class="text-[11px] text-amber-400 uppercase tracking-widest font-semibold block mt-0.5">Panadería Artesanal</span>
+                    </div>
+                </div>
+
+                <!-- Botones Superiores -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button onclick="openInventoryModal()" class="flex items-center space-x-2 px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded-xl text-xs transition shadow-md">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span class="hidden sm:inline">Gestión de Inventario</span>
+                        <span class="sm:hidden">Inventario</span>
+                    </button>
+                    
+                    <button onclick="toggleMobileCart()" class="relative p-2.5 bg-stone-800 hover:bg-stone-700 text-amber-300 rounded-xl transition lg:hidden border border-stone-700">
+                        <i class="fa-solid fa-basket-shopping text-xl"></i>
+                        <span id="cart-badge-mobile" class="absolute -top-1 -right-1 bg-amber-500 text-stone-950 font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center hidden shadow">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="bg-stone-900 text-white relative overflow-hidden border-b border-stone-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div class="md:col-span-8 z-10 space-y-3">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>Horarios: Lunes a Domingo - 7:00 AM a 8:00 PM</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-amber-100 leading-tight">
+                        Haz tu pedido online y recíbelo fresco
+                    </h2>
+                    <p class="text-stone-300 text-xs sm:text-sm max-w-xl">
+                        Selecciona los panes y cachitos de tu preferencia. Controlamos nuestras existencias en tiempo real para garantizar entregas inmediatas.
+                    </p>
+                </div>
+                <div class="md:col-span-4 hidden md:flex justify-end">
+                    <div class="w-40 h-40 rounded-full bg-amber-500/10 border-4 border-amber-500/20 flex items-center justify-center text-amber-400 text-7xl">
+                        <i class="fa-solid fa-bread-slice"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- SECCIÓN IZQUIERDA: Catálogo de Productos -->
+        <section class="lg:col-span-7 xl:col-span-8 space-y-6">
+            
+            <!-- Barra de Filtros y Búsqueda -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-3.5 rounded-2xl border border-stone-200 shadow-sm gap-3">
+                <div class="flex space-x-2 overflow-x-auto pb-1 sm:pb-0">
+                    <button onclick="filterCategory('all')" id="btn-cat-all" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 text-white shadow whitespace-nowrap">
+                        Todos (10)
+                    </button>
+                    <button onclick="filterCategory('panes')" id="btn-cat-panes" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100 whitespace-nowrap">
+                        Panes (5)
+                    </button>
+                    <button onclick="filterCategory('cachitos')" id="btn-cat-cachitos" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100 whitespace-nowrap">
+                        Cachitos (5)
+                    </button>
+                </div>
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="search-input" onkeyup="renderProducts()" placeholder="Buscar pan o cachito..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-stone-400 text-xs"></i>
+                </div>
+            </div>
+
+            <!-- Grid de Productos -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" id="products-grid">
+                <!-- Se inyecta dinámicamente con JS -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN DERECHA: Carrito de Compras -->
+        <section id="cart-sidebar" class="fixed inset-0 z-40 bg-stone-900/50 backdrop-blur-sm lg:backdrop-blur-none lg:bg-transparent lg:static lg:z-auto lg:col-span-5 xl:col-span-4 transition-opacity duration-300 opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto">
+            <div class="absolute right-0 top-0 bottom-0 w-full max-w-md lg:max-w-none bg-white lg:rounded-2xl shadow-2xl lg:shadow-md border border-stone-200 flex flex-col h-full lg:h-[calc(100vh-6rem)] lg:sticky lg:top-24 overflow-hidden transition-transform duration-300 translate-x-full lg:translate-x-0" id="cart-drawer">
+                
+                <!-- Encabezado del Carrito -->
+                <div class="p-4 bg-stone-900 text-amber-50 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-basket-shopping text-amber-400 text-lg"></i>
+                        <h3 class="font-bold font-serif text-lg">Tu Pedido</h3>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="clearCart()" class="text-xs text-stone-400 hover:text-rose-400 transition flex items-center space-x-1" title="Vaciar pedido">
+                            <i class="fa-solid fa-trash-can"></i> <span>Vaciar</span>
+                        </button>
+                        <button onclick="toggleMobileCart()" class="lg:hidden text-stone-400 hover:text-white p-1">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Items en Carrito -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-stone-100" id="cart-items-container">
+                    <!-- JS inyectará ítems -->
+                </div>
+
+                <!-- Subtotales y Totales -->
+                <div class="p-4 bg-amber-50/60 border-t border-stone-200 space-y-2 text-xs">
+                    <div class="flex justify-between text-stone-600">
+                        <span>Subtotal de productos</span>
+                        <span id="summary-subtotal" class="font-bold text-stone-800">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-stone-600">
+                        <span>Costo de Envío</span>
+                        <span id="summary-shipping" class="font-bold text-stone-800">$0.00</span>
+                    </div>
+                    <div class="pt-2 border-t border-stone-300 flex justify-between items-baseline">
+                        <span class="font-bold text-stone-900 text-sm">TOTAL A PAGAR</span>
+                        <span id="summary-total" class="font-extrabold text-2xl text-amber-800">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Botón Continuar -->
+                <div class="p-4 bg-white border-t border-stone-200">
+                    <button id="btn-checkout" onclick="openCheckoutModal()" disabled 
+                        class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 disabled:bg-stone-300 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow transition flex items-center justify-center space-x-2 text-sm">
+                        <span>Proceder al Pago / WhatsApp</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DATOS DEL CLIENTE -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 bg-stone-900 text-amber-50 flex justify-between items-center">
+                <h3 class="font-serif font-bold text-lg text-amber-100">Datos para la Entrega</h3>
+                <button onclick="closeCheckoutModal()" class="text-stone-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="order-form" onsubmit="event.preventDefault(); processOrder();" class="p-5 overflow-y-auto space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-stone-700 mb-1">Método de Entrega *</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center justify-center p-3 border border-stone-300 rounded-xl cursor-pointer has-[:checked]:border-amber-600 has-[:checked]:bg-amber-50 font-semibold">
+                            <input type="radio" name="deliveryType" value="pickup" checked onchange="toggleDeliveryOptions()" class="sr-only">
+                            <i class="fa-solid fa-store mr-2 text-amber-700"></i> Retiro en Tienda
+                        </label>
+                        <label class="flex items-center justify-center p-3 border border-stone-300 rounded-xl cursor-pointer has-[:checked]:border-amber-600 has-[:checked]:bg-amber-50 font-semibold">
+                            <input type="radio" name="deliveryType" value="delivery" onchange="toggleDeliveryOptions()" class="sr-only">
+                            <i class="fa-solid fa-motorcycle mr-2 text-amber-700"></i> Delivery (+$3.00)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">Nombre Completo *</label>
+                        <input type="text" id="customer-name" required placeholder="Ej: Carlos Mendoza" class="w-full px-3 py-2 rounded-lg border border-stone-300 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-stone-700 mb-1">Teléfono / WhatsApp *</label>
+                        <input type="tel" id="customer-phone" required placeholder="Ej: +58 412 1234567" class="w-full px-3 py-2 rounded-lg border border-stone-300 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div id="address-field" class="hidden">
+                    <label class="block font-semibold text-stone-700 mb-1">Dirección Exacta de Envío *</label>
+                    <input type="text" id="customer-address" placeholder="Calle, Edificio, Apto, Punto de Referencia..." class="w-full px-3 py-2 rounded-lg border border-stone-300 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-stone-700 mb-1">Método de Pago Preferido *</label>
+                    <select id="payment-method" class="w-full px-3 py-2 rounded-lg border border-stone-300 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                        <option value="Efectivo en Divisas / Bs">Efectivo en Divisas / Bs</option>
+                        <option value="Pago Móvil / Transferencia">Pago Móvil / Transferencia</option>
+                        <option value="Zelle">Zelle</option>
+                        <option value="Punto de Venta POS">Punto de Venta POS (Solo tienda)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-stone-700 mb-1">Notas para la cocina / entrega</label>
+                    <textarea id="order-notes" rows="2" placeholder="Ej: Pan rebanado, empacado para regalo, sin picante..." class="w-full px-3 py-2 rounded-lg border border-stone-300 focus:ring-1 focus:ring-amber-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeCheckoutModal()" class="px-4 py-2 border border-stone-300 rounded-xl font-semibold hover:bg-stone-100">
+                        Volver
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow flex items-center space-x-1.5">
+                        <i class="fa-brands fa-whatsapp text-base"></i>
+                        <span>Enviar Pedido a WhatsApp</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL RESUMEN FINAL / WHATSAPP -->
+    <div id="summary-modal" class="fixed inset-0 z-50 bg-stone-900/70 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 space-y-4">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold mb-2">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="font-serif font-bold text-xl text-stone-800">¡Pedido Listo para Enviar!</h3>
+                <p class="text-xs text-stone-500">El inventario ha sido actualizado en la base de datos local.</p>
+            </div>
+
+            <div class="bg-stone-900 text-emerald-400 p-3.5 rounded-xl text-xs font-mono overflow-y-auto max-h-52 border border-stone-800 whitespace-pre-wrap shadow-inner" id="summary-text-container"></div>
+
+            <div class="space-y-2">
+                <a id="btn-send-whatsapp" href="#" target="_blank" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg flex items-center justify-center space-x-2 text-xs">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Abrir en WhatsApp</span>
+                </a>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copySummary()" class="py-2.5 border border-stone-300 hover:bg-stone-100 font-semibold rounded-xl text-xs text-stone-700">
+                        <i class="fa-regular fa-copy mr-1"></i> Copiar Texto
+                    </button>
+                    <button onclick="closeSummaryModal()" class="py-2.5 bg-stone-200 hover:bg-stone-300 font-semibold rounded-xl text-xs text-stone-800">
+                        Cerrar y Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GESTIÓN DE INVENTARIO -->
+    <div id="inventory-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-4 bg-stone-900 text-amber-50 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-boxes-stacked text-amber-400"></i>
+                    <h3 class="font-serif font-bold text-lg text-amber-100">Administrador de Inventario</h3>
+                </div>
+                <button onclick="closeInventoryModal()" class="text-stone-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto space-y-2" id="inventory-list-container">
+                <!-- Se llena con JS -->
+            </div>
+
+            <div class="p-4 bg-stone-50 border-t border-stone-200 flex justify-between items-center">
+                <button onclick="resetDefaultStock()" class="text-xs text-rose-600 font-semibold hover:underline flex items-center space-x-1">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Restablecer Stock Inicial</span>
+                </button>
+                <button onclick="closeInventoryModal()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs">
+                    Guardar y Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIÓN TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 bg-stone-900 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-medium flex items-center space-x-2.5 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none border border-stone-700">
+        <i class="fa-solid fa-circle-check text-amber-400 text-sm"></i>
+        <span id="toast-message">Mensaje</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-6 text-center text-xs border-t border-stone-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 Miga & Masa - Sistema Web de Pedidos e Inventario</p>
+        </div>
+    </footer>
+
+    <script>
+        // PRODUCTOS BASE DE LA PANADERÍA
+        const DEFAULT_PRODUCTS = [
+            { id: 'p1', name: 'Pan de queso', price: 10.0, category: 'panes', stock: 20, icon: 'fa-cheese' },
+            { id: 'p2', name: 'Pan de cajeta', price: 10.0, category: 'panes', stock: 15, icon: 'fa-jar' },
+            { id: 'p3', name: 'Pan de guayaba y queso', price: 10.0, category: 'panes', stock: 15, icon: 'fa-cookie-bite' },
+            { id: 'p4', name: 'Pan de jamón', price: 25.0, category: 'panes', stock: 10, icon: 'fa-drumstick-bite' },
+            { id: 'p5', name: 'Pan piñita 6unidades', price: 5.0, category: 'panes', stock: 25, icon: 'fa-cubes' },
+            { id: 'p6', name: 'Cachitos de bacon y queso crema', price: 3.0, category: 'cachitos', stock: 30, icon: 'fa-bacon' },
+            { id: 'p7', name: 'Cachito de jamón y queso', price: 3.0, category: 'cachitos', stock: 30, icon: 'fa-hotdog' },
+            { id: 'p8', name: 'Cachito de queso', price: 3.0, category: 'cachitos', stock: 35, icon: 'fa-cheese' },
+            { id: 'p9', name: 'Cachito de jamón', price: 3.0, category: 'cachitos', stock: 30, icon: 'fa-hotdog' },
+            { id: 'p10', name: 'Cachito de queso crema, bacon y jalapeño', price: 3.5, category: 'cachitos', stock: 25, icon: 'fa-pepper-hot' }
+        ];
+
+        let PRODUCTS = [];
+        let cart = [];
+        let activeCategory = 'all';
+        let shippingFee = 0.00;
+        let generatedText = '';
+
+        // Cargar stock guardado en localStorage o inicializar
+        window.onload = function() {
+            loadInventory();
+            renderProducts();
+            updateCartUI();
+        };
+
+        function loadInventory() {
+            const saved = localStorage.getItem('bakery_inventory');
+            if (saved) {
+                try {
+                    PRODUCTS = JSON.parse(saved);
+                } catch (e) {
+                    PRODUCTS = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+                }
+            } else {
+                PRODUCTS = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+                saveInventory();
+            }
+        }
+
+        function saveInventory() {
+            localStorage.setItem('bakery_inventory', JSON.stringify(PRODUCTS));
+        }
+
+        function resetDefaultStock() {
+            PRODUCTS = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+            saveInventory();
+            renderInventoryList();
+            renderProducts();
+            updateCartUI();
+            showToast('Inventario restablecido al origen');
+        }
+
+        function filterCategory(cat) {
+            activeCategory = cat;
+            ['all', 'panes', 'cachitos'].forEach(c => {
+                const btn = document.getElementById(`btn-cat-${c}`);
+                if (c === cat) {
+                    btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 text-white shadow whitespace-nowrap";
+                } else {
+                    btn.className = "px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100 whitespace-nowrap";
+                }
+            });
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            const search = document.getElementById('search-input').value.toLowerCase();
+
+            const filtered = PRODUCTS.filter(p => {
+                const matchCat = activeCategory === 'all' || p.category === activeCategory;
+                const matchSearch = p.name.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+
+            grid.innerHTML = filtered.map(p => {
+                const cartItem = cart.find(i => i.id === p.id);
+                const qtyInCart = cartItem ? cartItem.quantity : 0;
+                const isOut = p.stock <= 0;
+
+                return `
+                    <div class="bg-white rounded-2xl p-4 border border-stone-200 shadow-sm flex flex-col justify-between hover:shadow-md transition ${isOut ? 'opacity-65 bg-stone-50' : ''}">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${isOut ? 'bg-rose-100 text-rose-700 border border-rose-300' : p.stock <= 5 ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'}">
+                                    ${isOut ? 'Agotado' : `Disponibles: ${p.stock}`}
+                                </span>
+                                <span class="font-extrabold text-amber-900 text-lg">$${p.price.toFixed(2)}</span>
+                            </div>
+                            <div class="flex items-center space-x-3 my-2">
+                                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-base font-bold shadow-inner flex-shrink-0">
+                                    <i class="fa-solid ${p.icon}"></i>
+                                </div>
+                                <h3 class="font-bold text-stone-800 text-sm font-serif leading-tight">${p.name}</h3>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            ${isOut ? `
+                                <button disabled class="w-full py-2.5 bg-stone-200 text-stone-400 font-bold rounded-xl text-xs cursor-not-allowed">
+                                    Sin Stock Disponible
+                                </button>
+                            ` : qtyInCart === 0 ? `
+                                <button onclick="addToCart('${p.id}')" class="w-full py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1.5 active:scale-95">
+                                    <i class="fa-solid fa-plus text-amber-700"></i>
+                                    <span>Añadir al pedido</span>
+                                </button>
+                            ` : `
+                                <div class="flex items-center justify-between bg-stone-100 p-1 rounded-xl border border-stone-300">
+                                    <button onclick="changeQty('${p.id}', -1)" class="w-8 h-8 rounded-lg bg-white shadow flex items-center justify-center text-stone-700 font-bold text-sm active:scale-95">
+                                        -
+                                    </button>
+                                    <span class="font-bold text-sm text-stone-800 px-2">${qtyInCart}</span>
+                                    <button onclick="changeQty('${p.id}', 1)" ${qtyInCart >= p.stock ? 'disabled class="w-8 h-8 rounded-lg bg-stone-200 text-stone-400 flex items-center justify-center cursor-not-allowed"' : 'class="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-bold text-sm active:scale-95 shadow"'}>
+                                        +
+                                    </button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addToCart(id) {
+            const p = PRODUCTS.find(item => item.id === id);
+            if (!p || p.stock <= 0) return;
+
+            const inCart = cart.find(item => item.id === id);
+            if (inCart) {
+                if (inCart.quantity < p.stock) {
+                    inCart.quantity++;
+                    showToast('Cantidad actualizada');
+                } else {
+                    showToast(`Solo quedan ${p.stock} unidades disponibles`);
+                }
+            } else {
+                cart.push({ id: id, quantity: 1 });
+                showToast('Añadido al pedido');
+            }
+            updateCartUI();
+            renderProducts();
+        }
+
+        function changeQty(id, delta) {
+            const p = PRODUCTS.find(item => item.id === id);
+            const index = cart.findIndex(item => item.id === id);
+
+            if (index !== -1 && p) {
+                const newQty = cart[index].quantity + delta;
+                if (newQty > p.stock) {
+                    showToast(`Stock máximo disponible (${p.stock})`);
+                    return;
+                }
+                if (newQty <= 0) {
+                    cart.splice(index, 1);
+                } else {
+                    cart[index].quantity = newQty;
+                }
+            }
+            updateCartUI();
+            renderProducts();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+            renderProducts();
+            showToast('Carrito vaciado');
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const badgeMobile = document.getElementById('cart-badge-mobile');
+            const totalCount = cart.reduce((acc, i) => acc + i.quantity, 0);
+
+            if (totalCount > 0) {
+                badgeMobile.innerText = totalCount;
+                badgeMobile.classList.remove('hidden');
+            } else {
+                badgeMobile.classList.add('hidden');
+            }
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center py-12 text-stone-400 space-y-3">
+                        <div class="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center text-stone-300 text-2xl">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-stone-600">Tu carrito está vacío</p>
+                            <p class="text-xs text-stone-400 mt-1">Explora el catálogo y añade tus panes preferidos</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('btn-checkout').disabled = true;
+                calculateTotals(0);
+                return;
+            }
+
+            document.getElementById('btn-checkout').disabled = false;
+
+            let subtotal = 0;
+            container.innerHTML = cart.map(item => {
+                const p = PRODUCTS.find(prod => prod.id === item.id);
+                const itemTotal = p.price * item.quantity;
+                subtotal += itemTotal;
+
+                return `
+                    <div class="pt-3 first:pt-0">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-stone-800">${p.name}</span>
+                            <span class="font-bold text-stone-900">$${itemTotal.toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1.5">
+                            <span class="text-[11px] text-stone-400">$${p.price.toFixed(2)} c/u</span>
+                            <div class="flex items-center space-x-2 bg-stone-100 px-2 py-0.5 rounded-lg border border-stone-200">
+                                <button onclick="changeQty('${p.id}', -1)" class="text-stone-700 font-bold px-1 text-xs">-</button>
+                                <span class="font-bold text-xs px-1 text-stone-800">${item.quantity}</span>
+                                <button onclick="changeQty('${p.id}', 1)" class="text-stone-700 font-bold px-1 text-xs">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            calculateTotals(subtotal);
+        }
+
+        function calculateTotals(subtotal) {
+            const total = subtotal + shippingFee;
+            document.getElementById('summary-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('summary-shipping').innerText = `$${shippingFee.toFixed(2)}`;
+            document.getElementById('summary-total').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function toggleDeliveryOptions() {
+            const type = document.querySelector('input[name="deliveryType"]:checked').value;
+            const addr = document.getElementById('address-field');
+            const addrInput = document.getElementById('customer-address');
+
+            if (type === 'delivery') {
+                addr.classList.remove('hidden');
+                addrInput.required = true;
+                shippingFee = 3.00;
+            } else {
+                addr.classList.add('hidden');
+                addrInput.required = false;
+                shippingFee = 0.00;
+            }
+            updateCartUI();
+        }
+
+        // CONTROL DE MODALES
+        function openCheckoutModal() {
+            if (cart.length === 0) return;
+            document.getElementById('checkout-modal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('summary-modal').classList.add('opacity-0', 'pointer-events-none');
+            clearCart();
+        }
+
+        function openInventoryModal() {
+            renderInventoryList();
+            document.getElementById('inventory-modal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+        function closeInventoryModal() {
+            document.getElementById('inventory-modal').classList.add('opacity-0', 'pointer-events-none');
+            renderProducts();
+            updateCartUI();
+        }
+
+        function toggleMobileCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const sidebar = document.getElementById('cart-sidebar');
+
+            if (sidebar.classList.contains('opacity-0')) {
+                sidebar.classList.remove('opacity-0', 'pointer-events-none');
+                drawer.classList.remove('translate-x-full');
+            } else {
+                sidebar.classList.add('opacity-0', 'pointer-events-none');
+                drawer.classList.add('translate-x-full');
+            }
+        }
+
+        // GESTIÓN DE INVENTARIO
+        function renderInventoryList() {
+            const container = document.getElementById('inventory-list-container');
+            container.innerHTML = PRODUCTS.map(p => `
+                <div class="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs">
+                    <div>
+                        <h4 class="font-bold text-stone-800">${p.name}</h4>
+                        <span class="text-amber-800 font-bold">$${p.price.toFixed(2)}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="adjustStock('${p.id}', -1)" class="w-7 h-7 bg-stone-200 font-bold rounded-lg flex items-center justify-center text-stone-700 active:scale-95">-</button>
+                        <input type="number" min="0" value="${p.stock}" onchange="setDirectStock('${p.id}', this.value)" class="w-14 text-center py-1 border border-stone-300 font-bold rounded-lg bg-white text-stone-900 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                        <button onclick="adjustStock('${p.id}', 1)" class="w-7 h-7 bg-amber-600 text-white font-bold rounded-lg flex items-center justify-center active:scale-95 shadow">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function adjustStock(id, delta) {
+            const p = PRODUCTS.find(item => item.id === id);
+            if (p) {
+                p.stock = Math.max(0, p.stock + delta);
+                saveInventory();
+                renderInventoryList();
+            }
+        }
+
+        function setDirectStock(id, val) {
+            const p = PRODUCTS.find(item => item.id === id);
+            if (p) {
+                p.stock = Math.max(0, parseInt(val) || 0);
+                saveInventory();
+                renderInventoryList();
+            }
+        }
+
+        // PROCESAR PEDIDO Y DESCONTAR DEL STOCK
+        function processOrder() {
+            const name = document.getElementById('customer-name').value;
+            const phone = document.getElementById('customer-phone').value;
+            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+            const address = document.getElementById('customer-address').value;
+            const payment = document.getElementById('payment-method').value;
+            const notes = document.getElementById('order-notes').value;
+
+            // Descontar inventario y guardar en localStorage
+            cart.forEach(item => {
+                const p = PRODUCTS.find(prod => prod.id === item.id);
+                if (p) {
+                    p.stock = Math.max(0, p.stock - item.quantity);
+                }
+            });
+            saveInventory();
+
+            let subtotal = 0;
+            let itemsText = '';
+            cart.forEach(item => {
+                const p = PRODUCTS.find(prod => prod.id === item.id);
+                const totalItem = p.price * item.quantity;
+                subtotal += totalItem;
+                itemsText += `• ${item.quantity}x ${p.name} ($${p.price.toFixed(2)}) = *$${totalItem.toFixed(2)}*\n`;
+            });
+
+            const total = subtotal + shippingFee;
+
+            let msg = `🥐 *NUEVO PEDIDO - PANADERÍA MIGA & MASA* 🥖\n`;
+            msg += `----------------------------------\n`;
+            msg += `👤 *Cliente:* ${name}\n`;
+            msg += `📞 *Teléfono:* ${phone}\n`;
+            msg += `📌 *Entrega:* ${deliveryType === 'delivery' ? '🛵 Delivery' : '🏪 Retiro en Tienda'}\n`;
+            if (deliveryType === 'delivery') msg += `🏠 *Dirección:* ${address}\n`;
+            msg += `💳 *Método de Pago:* ${payment}\n`;
+            msg += `----------------------------------\n`;
+            msg += `📋 *DETALLE DEL PEDIDO:*\n${itemsText}`;
+            msg += `----------------------------------\n`;
+            msg += `Subtotal: $${subtotal.toFixed(2)}\n`;
+            if (deliveryType === 'delivery') msg += `Costo Envío: $${shippingFee.toFixed(2)}\n`;
+            msg += `💰 *TOTAL A PAGAR: $${total.toFixed(2)}*\n`;
+            if (notes.trim()) msg += `📝 *Notas:* ${notes}\n`;
+            msg += `----------------------------------\n¡Muchas gracias por su preferencia!`;
+
+            generatedText = msg;
+
+            document.getElementById('summary-text-container').innerText = msg;
+            
+            // Coloca el número de WhatsApp de la panadería aquí si deseas
+            const bakeryPhone = "584120000000"; 
+            document.getElementById('btn-send-whatsapp').href = `https://api.whatsapp.com/send?phone=${bakeryPhone}&text=${encodeURIComponent(msg)}`;
+
+            closeCheckoutModal();
+            document.getElementById('summary-modal').classList.remove('opacity-0', 'pointer-events-none');
+            renderProducts();
+        }
+
+        function copySummary() {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = generatedText;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            showToast('Copiado al portapapeles');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
